@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profissional do Futuro</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="shortcut icon" href="imagens/ideau.io" type="image/ideau.io">
+</head>
+<body>
+
+<div class="page">
+  <div class="hero">
+    <div class="badge">Projeto Educacional</div>
+    <h1>Profissional do Futuro</h1>
+    <p>Selecione sua cidade e colégio para conferir os horários das atividades disponíveis.</p>
+    <img class="img" src="imagens/logoideau.png" alt="Logo">
+  </div>
+
+  <div class="card">
+    <div class="card-top">
+      <div class="step-label"><div class="step-dot"></div> Encontre seu colégio</div>
+      <div class="selects-grid">
+        <div class="select-wrap">
+          <label>Cidade</label>
+          <select id="cidade" onchange="atualizarColegios()">
+            <option value="">Selecione...</option>
+            <option value="Bage">Bagé</option>
+            <option value="hulhanegra">Hulha Negra</option>
+            <option value="candiota">Candiota</option>
+            <option value="dompedrito">Dom Pedrito</option>
+            <option value="acegua">Aceguá</option>
+            <option value="pinheiro">Pinheiro Machado</option>
+          </select>
+        </div>
+        <div class="select-wrap">
+          <label>Colégio</label>
+          <select id="colegio" onchange="mostrarHorarios()" disabled>
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="resultado">
+        <div class="placeholder">
+          <div class="placeholder-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2d7a52" stroke-width="1.5" stroke-linecap="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <path d="M8 2v4M16 2v4M3 10h18"/>
+              <path d="M8 14h2M14 14h2M8 18h2"/>
+            </svg>
+          </div>
+          <p>Escolha sua cidade e colégio<br>para ver os horários.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card consulta-card">
+    <div class="card-top">
+      <div class="step-label"><div class="step-dot"></div> Consulte sua pontuação</div>
+      <div class="cpf-grid">
+        <div class="select-wrap">
+          <label for="cpf">CPF do aluno</label>
+          <input
+            id="cpf"
+            type="text"
+            inputmode="numeric"
+            maxlength="14"
+            placeholder="000.000.000-00"
+            oninput="formatarCPF(this)"
+          >
+        </div>
+        <button class="action-button" onclick="consultarPontuacao()">Consultar</button>
+      </div>
+      <p class="helper-text">Use apenas CPFs autorizados e valide os dados em um sistema seguro.</p>
+    </div>
+    <div class="card-body">
+      <div id="resultadoPontuacao">
+        <div class="placeholder">
+          <div class="placeholder-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2d7a52" stroke-width="1.5" stroke-linecap="round">
+              <path d="M12 1v22"/>
+              <path d="M17 5H9.5a3.5 3.5 0 000 7H14.5a3.5 3.5 0 010 7H6"/>
+            </svg>
+          </div>
+          <p>Digite o CPF para consultar a pontuação do aluno.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card consulta-card">
+    <div class="card-top">
+      <div class="admin-header">
+        <div class="step-label"><div class="step-dot"></div> Acesso restrito</div>
+        <button id="adminSair" class="action-button secondary-button hidden" type="button" onclick="sairAdmin()">Sair</button>
+      </div>
+
+      <div id="adminLoginArea">
+        <form class="admin-form" onsubmit="entrarAdmin(event)">
+          <div class="select-wrap">
+            <label for="adminUsuario">Usuario</label>
+            <input
+              id="adminUsuario"
+              type="text"
+              placeholder="Digite o usuario"
+              autocomplete="username"
+              required
+            >
+          </div>
+          <div class="select-wrap">
+            <label for="adminSenha">Senha</label>
+            <input
+              id="adminSenha"
+              type="password"
+              placeholder="Digite a senha"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+          <button class="action-button form-full" type="submit">Entrar</button>
+        </form>
+        <p class="helper-text">Somente administradores autorizados podem abrir a area de cadastro.</p>
+      </div>
+    </div>
+
+    <div id="adminCadastroArea" class="card-body hidden">
+      <form class="admin-form" onsubmit="salvarAluno(event)">
+        <div class="select-wrap form-full">
+          <label for="nomeAluno">Nome do aluno</label>
+          <input
+            id="nomeAluno"
+            type="text"
+            placeholder="Digite o nome completo"
+            required
+          >
+        </div>
+        <div class="select-wrap">
+          <label for="cpfCadastro">CPF do aluno</label>
+          <input
+            id="cpfCadastro"
+            type="text"
+            inputmode="numeric"
+            maxlength="14"
+            placeholder="000.000.000-00"
+            oninput="formatarCPF(this)"
+            required
+          >
+        </div>
+        <div class="select-wrap">
+          <label for="pontuacaoAluno">Pontuacao</label>
+          <input
+            id="pontuacaoAluno"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Ex: 85"
+            required
+          >
+        </div>
+        <button class="action-button form-full" type="submit">Salvar aluno</button>
+      </form>
+
+      <div id="resultadoCadastro" class="admin-feedback">
+        <div class="status-box info">
+          A area administrativa foi liberada. Cadastre ou atualize a pontuacao do aluno.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
