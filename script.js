@@ -55,6 +55,25 @@ const dados = {
   }
 };
 
+const eventosGerais = [
+  {
+    hora: "8 de outubro",
+    nome: "Workshop das profissoes",
+    local: "Todas as escolas"
+  },
+  {
+    hora: "12 de novembro",
+    nome: "Vestibular de Verao",
+    local: "Todas as escolas"
+  }
+];
+
+Object.values(dados).forEach((cidade) => {
+  Object.values(cidade.colegios).forEach((colegio) => {
+    colegio.atividades = eventosGerais.map((evento) => ({ ...evento }));
+  });
+});
+
 // =====================
 // UTIL
 // =====================
