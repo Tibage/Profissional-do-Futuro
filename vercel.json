@@ -1,12 +1,7 @@
 {
   "functions": {
     "api/index.js": {
-      "includeFiles": [
-        "index.html",
-        "style.css",
-        "script.js",
-        "imagens/**"
-      ]
+      "includeFiles": "{index.html,style.css,script.js,imagens/**}"
     }
   },
   "rewrites": [
