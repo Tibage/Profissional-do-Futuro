@@ -616,26 +616,41 @@ async function handleAdminAlunoRoutes(request, response, url) {
 
 function serveStaticFile(request, response) {
   const requestPath = request.url === "/" ? "/index.html" : decodeURIComponent(request.url.split("?")[0]);
-  const safePath = path.normalize(path.join(ROOT_DIR, requestPath));
+  const publicDir = path.join(ROOT_DIR, "public");
+  const candidatePaths = [
+    path.normalize(path.join(ROOT_DIR, requestPath)),
+    path.normalize(path.join(publicDir, requestPath))
+  ];
 
-  if (!safePath.startsWith(ROOT_DIR)) {
+  const isSafePath = (filePath) => filePath.startsWith(ROOT_DIR);
+  if (candidatePaths.some((filePath) => !isSafePath(filePath))) {
     sendText(response, 403, "Acesso negado.");
     return;
   }
 
-  fs.readFile(safePath, (error, fileBuffer) => {
-    if (error) {
+  const serveCandidate = (index) => {
+    const safePath = candidatePaths[index];
+    if (!safePath) {
       sendText(response, 404, "Arquivo nao encontrado.");
       return;
     }
 
-    const ext = path.extname(safePath).toLowerCase();
-    response.writeHead(200, withSecurityHeaders({
-      "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
-      "Cache-Control": ext === ".html" ? "no-store" : "public, max-age=3600"
-    }));
-    response.end(fileBuffer);
-  });
+    fs.readFile(safePath, (error, fileBuffer) => {
+      if (error) {
+        serveCandidate(index + 1);
+        return;
+      }
+
+      const ext = path.extname(safePath).toLowerCase();
+      response.writeHead(200, withSecurityHeaders({
+        "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+        "Cache-Control": ext === ".html" ? "no-store" : "public, max-age=3600"
+      }));
+      response.end(fileBuffer);
+    });
+  };
+
+  serveCandidate(0);
 }
 
 function applyCors(request, response) {
