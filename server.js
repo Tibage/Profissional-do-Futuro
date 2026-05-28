@@ -686,13 +686,17 @@ async function handleRequest(request, response) {
   }
 }
 
-const server = http.createServer(handleRequest);
+if (require.main === module) {
+  const server = http.createServer(handleRequest);
 
-server.listen(PORT, () => {
-  const missingConfig = validateServerConfig();
-  console.log(`Servidor iniciado em http://localhost:${PORT}`);
+  server.listen(PORT, () => {
+    const missingConfig = validateServerConfig();
+    console.log(`Servidor iniciado em http://localhost:${PORT}`);
 
-  if (missingConfig.length > 0) {
-    console.log(`Pendencias no .env: ${missingConfig.join(", ")}`);
-  }
-});
+    if (missingConfig.length > 0) {
+      console.log(`Pendencias no .env: ${missingConfig.join(", ")}`);
+    }
+  });
+}
+
+module.exports = handleRequest;

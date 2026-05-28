@@ -1,0 +1,22 @@
+{
+  "functions": {
+    "api/index.js": {
+      "includeFiles": [
+        "index.html",
+        "style.css",
+        "script.js",
+        "imagens/**"
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
+  ]
+}
