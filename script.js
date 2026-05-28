@@ -83,6 +83,11 @@ async function requestJson(url, options = {}) {
   } else {
     const text = await response.text();
     const pareceHtml = text.trim().startsWith("<!DOCTYPE html") || text.trim().startsWith("<html");
+    const usandoLiveServer = ["5500", "5501"].includes(window.location.port);
+
+    if (usandoLiveServer) {
+      throw new Error("Voce abriu pelo Live Server. Inicie com 'npm start' e acesse http://localhost:3000 para usar o login.");
+    }
 
     if (pareceHtml) {
       throw new Error("Abra o projeto pelo servidor local. Inicie com 'node server.js' ou 'npm start' e acesse http://localhost:3000.");
