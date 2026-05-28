@@ -59,12 +59,12 @@ const eventosGerais = [
   {
     hora: "8 de outubro",
     nome: "Workshop das profissoes",
-    local: "Todas as escolas"
+    local: "Faculdade IDEAU"
   },
   {
     hora: "12 de novembro",
     nome: "Vestibular de Verao",
-    local: "Todas as escolas"
+    local: "Faculdade IDEAU"
   }
 ];
 
