@@ -236,21 +236,7 @@ function normalizeCpf(value) {
 
 function isValidCpf(cpf) {
   const normalized = normalizeCpf(cpf);
-  if (normalized.length !== 11) return false;
-  if (/^(\d)\1{10}$/.test(normalized)) return false;
-
-  const digits = normalized.split("").map(Number);
-  const firstSum = digits.slice(0, 9).reduce((sum, digit, index) => {
-    return sum + digit * (10 - index);
-  }, 0);
-  const firstCheck = (firstSum * 10) % 11;
-  if ((firstCheck === 10 ? 0 : firstCheck) !== digits[9]) return false;
-
-  const secondSum = digits.slice(0, 10).reduce((sum, digit, index) => {
-    return sum + digit * (11 - index);
-  }, 0);
-  const secondCheck = (secondSum * 10) % 11;
-  return (secondCheck === 10 ? 0 : secondCheck) === digits[10];
+  return normalized.length === 11;
 }
 
 function requireValidCpf(cpf) {
