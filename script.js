@@ -1,22 +1,22 @@
 // =====================
-// DADOS DOS COLEGIOS
+// DADOS DOS COLÉGIOS
 // =====================
 const dados = {
   Bage: {
     colegios: {
-      col1: { nome: "Silveira Martins", cidade: "Bage", atividades: [] },
-      col2: { nome: "Waldemar Amoretty", cidade: "Bage", atividades: [] },
-      col3: { nome: "Carlos Kluwe", cidade: "Bage", atividades: [] },
-      col4: { nome: "CFES", cidade: "Bage", atividades: [] },
-      col5: { nome: "CAIC", cidade: "Bage", atividades: [] },
-      col6: { nome: "Frei Placido", cidade: "Bage", atividades: [] },
-      col7: { nome: "Justino Quintana", cidade: "Bage", atividades: [] },
-      col8: { nome: "Jose Gomes Filho", cidade: "Bage", atividades: [] },
-      col9: { nome: "Farroupilha", cidade: "Bage", atividades: [] },
-      col10: { nome: "Luiz Mercio Teixeira", cidade: "Bage", atividades: [] },
-      col11: { nome: "Luiz Maria Ferraz", cidade: "Bage", atividades: [] },
-      col12: { nome: "Auxiliadora", cidade: "Bage", atividades: [] },
-      col13: { nome: "Bradesco", cidade: "Bage", atividades: [] }
+      col1: { nome: "Silveira Martins", cidade: "Bagé", atividades: [] },
+      col2: { nome: "Waldemar Amoretty", cidade: "Bagé", atividades: [] },
+      col3: { nome: "Carlos Kluwe", cidade: "Bagé", atividades: [] },
+      col4: { nome: "CFES", cidade: "Bagé", atividades: [] },
+      col5: { nome: "CAIC", cidade: "Bagé", atividades: [] },
+      col6: { nome: "Frei Plácido", cidade: "Bagé", atividades: [] },
+      col7: { nome: "Justino Quintana", cidade: "Bagé", atividades: [] },
+      col8: { nome: "José Gomes Filho", cidade: "Bagé", atividades: [] },
+      col9: { nome: "Farroupilha", cidade: "Bagé", atividades: [] },
+      col10: { nome: "Luiz Mércio Teixeira", cidade: "Bagé", atividades: [] },
+      col11: { nome: "Luiz Maria Ferraz", cidade: "Bagé", atividades: [] },
+      col12: { nome: "Auxiliadora", cidade: "Bagé", atividades: [] },
+      col13: { nome: "Bradesco", cidade: "Bagé", atividades: [] }
     }
   },
   hulhanegra: {
@@ -28,29 +28,29 @@ const dados = {
   candiota: {
     colegios: {
       col1: { nome: "08 de Agosto", cidade: "Candiota", atividades: [] },
-      col2: { nome: "Jeronimo Mercio", cidade: "Candiota", atividades: [] },
+      col2: { nome: "Jerônimo Mércio", cidade: "Candiota", atividades: [] },
       col3: { nome: "Francisco Assis", cidade: "Candiota", atividades: [] }
     }
   },
   dompedrito: {
     colegios: {
       col1: { nome: "CIEP", cidade: "Dom Pedrito", atividades: [] },
-      col2: { nome: "Nossa Senhora do Patrocinio", cidade: "Dom Pedrito", atividades: [] },
-      col3: { nome: "Candida Corina", cidade: "Dom Pedrito", atividades: [] },
+      col2: { nome: "Nossa Senhora do Patrocínio", cidade: "Dom Pedrito", atividades: [] },
+      col3: { nome: "Cândida Corina", cidade: "Dom Pedrito", atividades: [] },
       col4: { nome: "E.E.E.P. Dom Pedrito", cidade: "Dom Pedrito", atividades: [] },
       col5: { nome: "Senhora do Horto", cidade: "Dom Pedrito", atividades: [] },
       col6: { nome: "Risoleta de Quadros", cidade: "Dom Pedrito", atividades: [] },
-      col7: { nome: "Getulio Dornelles Vargas", cidade: "Dom Pedrito", atividades: [] }
+      col7: { nome: "Getúlio Dornelles Vargas", cidade: "Dom Pedrito", atividades: [] }
     }
   },
   acegua: {
     colegios: {
-      col1: { nome: "Barao do Acegua", cidade: "Acegua", atividades: [] }
+      col1: { nome: "Barão do Aceguá", cidade: "Aceguá", atividades: [] }
     }
   },
   pinheiro: {
     colegios: {
-      col1: { nome: "Hipolito Ribeiro", cidade: "Pinheiro Machado", atividades: [] }
+      col1: { nome: "Hipólito Ribeiro", cidade: "Pinheiro Machado", atividades: [] }
     }
   }
 };
@@ -58,12 +58,12 @@ const dados = {
 const eventosGerais = [
   {
     hora: "8 de outubro",
-    nome: "Workshop das profissoes",
+    nome: "Workshop das profissões",
     local: "Faculdade IDEAU"
   },
   {
     hora: "12 de novembro",
-    nome: "Vestibular de Verao",
+    nome: "Vestibular de Verão",
     local: "Faculdade IDEAU"
   }
 ];
@@ -105,7 +105,7 @@ async function requestJson(url, options = {}) {
     const usandoLiveServer = ["5500", "5501"].includes(window.location.port);
 
     if (usandoLiveServer) {
-      throw new Error("Voce abriu pelo Live Server. Inicie com 'npm start' e acesse http://localhost:3000 para usar o login.");
+      throw new Error("Você abriu pelo Live Server. Inicie com 'npm start' e acesse http://localhost:3000 para usar o login.");
     }
 
     if (pareceHtml) {
@@ -116,7 +116,7 @@ async function requestJson(url, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(body.message || "Nao foi possivel concluir a requisicao.");
+    throw new Error(body.message || "Não foi possível concluir a requisição.");
   }
 
   return body;
@@ -130,7 +130,7 @@ function mostrarErro(container, mensagem) {
 }
 
 // =====================
-// COLEGIOS
+// COLÉGIOS
 // =====================
 function atualizarColegios() {
   const cidade = document.getElementById("cidade").value;
@@ -145,7 +145,7 @@ function atualizarColegios() {
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
       </div>
-      <p>Agora selecione o colegio.</p>
+      <p>Agora selecione o colégio.</p>
     </div>`;
 
   if (!cidade) {
@@ -198,7 +198,7 @@ function mostrarHorarios() {
             <path d="M12 8v4M12 16h.01"/>
           </svg>
         </div>
-        <p>Horarios em breve.</p>
+        <p>Horários em breve.</p>
       </div>`;
   } else {
     colegio.atividades.forEach((atividade) => {
@@ -223,7 +223,7 @@ function mostrarHorarios() {
 }
 
 // =====================
-// CONSULTA PUBLICA
+// CONSULTA PÚBLICA
 // =====================
 async function consultarPontuacao() {
   const input = document.getElementById("cpf");
@@ -231,7 +231,7 @@ async function consultarPontuacao() {
   const cpf = input.value.replace(/\D/g, "");
 
   if (cpf.length !== 11) {
-    mostrarErro(resultado, "Informe um CPF com 11 numeros para consultar a pontuacao.");
+    mostrarErro(resultado, "Informe um CPF com 11 números para consultar a pontuação.");
     return;
   }
 
@@ -254,7 +254,7 @@ async function consultarPontuacao() {
         </div>
         <div class="status-box success">
           <strong>${dadosAluno.nome}</strong><br>
-          Pontuacao localizada com sucesso.
+          Pontuação localizada com sucesso.
         </div>
       </div>`;
   } catch (error) {
@@ -263,7 +263,7 @@ async function consultarPontuacao() {
 }
 
 // =====================
-// AREA ADMIN
+// ÁREA ADMIN
 // =====================
 function atualizarAreaAdmin(autorizado) {
   const loginArea = document.getElementById("adminLoginArea");
@@ -334,12 +334,12 @@ async function salvarAluno(event) {
   }
 
   if (cpf.length !== 11) {
-    mostrarErro(resultado, "Informe um CPF com 11 numeros.");
+    mostrarErro(resultado, "Informe um CPF com 11 números.");
     return;
   }
 
   if (!Number.isFinite(pontuacao) || pontuacao < 0) {
-    mostrarErro(resultado, "Informe uma pontuacao valida.");
+    mostrarErro(resultado, "Informe uma pontuação válida.");
     return;
   }
 

@@ -241,7 +241,7 @@ function isValidCpf(cpf) {
 
 function requireValidCpf(cpf) {
   if (!isValidCpf(cpf)) {
-    const error = new Error("Informe um CPF valido com 11 numeros.");
+    const error = new Error("Informe um CPF válido com 11 números.");
     error.statusCode = 400;
     throw error;
   }
@@ -254,7 +254,7 @@ function sanitizeName(value) {
 function sanitizeScore(value) {
   const score = Number(value);
   if (!Number.isFinite(score) || score < 0 || !Number.isInteger(score)) {
-    const error = new Error("Informe uma pontuacao inteira e maior ou igual a zero.");
+    const error = new Error("Informe uma pontuação inteira e maior ou igual a zero.");
     error.statusCode = 400;
     throw error;
   }
@@ -305,7 +305,7 @@ function escapeLike(value) {
 
 async function dbQuery(text, params = []) {
   if (!db) {
-    const error = new Error("Banco de dados nao configurado.");
+    const error = new Error("Banco de dados não configurado.");
     error.statusCode = 500;
     throw error;
   }
@@ -469,7 +469,7 @@ async function handlePublicRoutes(request, response, url) {
 
     const aluno = await buscarPontuacaoPorCpf(cpf);
     if (!aluno) {
-      sendJson(response, 404, { message: "Nenhuma pontuacao encontrada para este CPF." });
+      sendJson(response, 404, { message: "Nenhuma pontuação encontrada para este CPF." });
       return true;
     }
 
@@ -508,7 +508,7 @@ async function handleAdminAuthRoutes(request, response, url) {
     const expectedPassword = ADMIN_PASSWORD;
 
     if (!safeEqual(username, expectedUsername) || !safeEqual(password, expectedPassword)) {
-      sendJson(response, 401, { message: "Usuario ou senha invalidos." });
+      sendJson(response, 401, { message: "Usuário ou senha inválidos." });
       return true;
     }
 
@@ -556,7 +556,7 @@ async function handleAdminAlunoRoutes(request, response, url) {
     requireValidCpf(routeCpf);
     const aluno = await buscarAlunoPorCpf(routeCpf);
     if (!aluno) {
-      sendJson(response, 404, { message: "Aluno nao encontrado." });
+      sendJson(response, 404, { message: "Aluno não encontrado." });
       return true;
     }
 
@@ -596,7 +596,7 @@ async function handleAdminAlunoRoutes(request, response, url) {
     return true;
   }
 
-  sendJson(response, 405, { message: "Metodo nao permitido para esta rota." });
+  sendJson(response, 405, { message: "Método não permitido para esta rota." });
   return true;
 }
 
@@ -617,7 +617,7 @@ function serveStaticFile(request, response) {
   const serveCandidate = (index) => {
     const safePath = candidatePaths[index];
     if (!safePath) {
-      sendText(response, 404, "Arquivo nao encontrado.");
+      sendText(response, 404, "Arquivo não encontrado.");
       return;
     }
 
@@ -674,7 +674,7 @@ async function handleRequest(request, response) {
     if (await handleAdminAlunoRoutes(request, response, url)) return;
 
     if (url.pathname.startsWith("/api/")) {
-      sendJson(response, 404, { message: "Rota nao encontrada." });
+      sendJson(response, 404, { message: "Rota não encontrada." });
       return;
     }
 
