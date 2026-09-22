@@ -20,6 +20,6 @@
     {
       "source": "/imagens/(.*)",
       "destination": "/api/index.js"
-    },
+    }
   ]
 }
