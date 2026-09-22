@@ -251,6 +251,16 @@ function sanitizeName(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
 
+function sanitizeSchool(value) {
+  const escola = sanitizeName(value);
+  if (!escola || escola.length > 160) {
+    const error = new Error("Informe uma escola válida.");
+    error.statusCode = 400;
+    throw error;
+  }
+  return escola;
+}
+
 function sanitizeScore(value) {
   const score = Number(value);
   if (!Number.isFinite(score) || score < 0 || !Number.isInteger(score)) {
@@ -322,7 +332,7 @@ async function dbQuery(text, params = []) {
 
 async function buscarPontuacaoPorCpf(cpf) {
   const rows = await dbQuery(
-    `select nome, pontuacao from ${tableIdentifier()} where cpf = $1 limit 1`,
+    `select nome, escola, pontuacao from ${tableIdentifier()} where cpf = $1 limit 1`,
     [cpf]
   );
   return rows && rows.length > 0 ? rows[0] : null;
@@ -330,7 +340,7 @@ async function buscarPontuacaoPorCpf(cpf) {
 
 async function buscarAlunoPorCpf(cpf) {
   const rows = await dbQuery(
-    `select nome, cpf, pontuacao from ${tableIdentifier()} where cpf = $1 limit 1`,
+    `select nome, cpf, escola, pontuacao from ${tableIdentifier()} where cpf = $1 limit 1`,
     [cpf]
   );
   return rows && rows.length > 0 ? rows[0] : null;
@@ -355,7 +365,7 @@ async function listarAlunos({ search, page, pageSize }) {
 
   values.push(pageSize, offset);
   const rows = await dbQuery(
-    `select nome, cpf, pontuacao
+    `select nome, cpf, escola, pontuacao
        from ${tableIdentifier()}
        ${whereClause}
       order by nome asc
@@ -371,7 +381,20 @@ async function listarAlunos({ search, page, pageSize }) {
   };
 }
 
-async function salvarOuAtualizarAluno({ nome, cpf, pontuacao }) {
+async function listarRankingDaEscola(escola, limit) {
+  const rows = await dbQuery(
+    `select nome, pontuacao,
+            dense_rank() over (order by pontuacao desc) as posicao
+       from ${tableIdentifier()}
+      where escola = $1
+      order by pontuacao desc, nome asc
+      limit $2`,
+    [escola, limit]
+  );
+  return rows || [];
+}
+
+async function salvarOuAtualizarAluno({ nome, cpf, escola, pontuacao }) {
   const aluno = await buscarAlunoPorCpf(cpf);
 
   if (aluno) {
@@ -379,15 +402,15 @@ async function salvarOuAtualizarAluno({ nome, cpf, pontuacao }) {
     const novaPontuacao = pontuacaoAtual + pontuacao;
 
     await dbQuery(
-      `update ${tableIdentifier()} set nome = $1, pontuacao = $2 where cpf = $3`,
-      [nome, novaPontuacao, cpf]
+      `update ${tableIdentifier()} set nome = $1, escola = $2, pontuacao = $3 where cpf = $4`,
+      [nome, escola, novaPontuacao, cpf]
     );
     return { action: "atualizado", total: novaPontuacao, adicionado: pontuacao };
   }
 
   await dbQuery(
-    `insert into ${tableIdentifier()} (nome, cpf, pontuacao) values ($1, $2, $3)`,
-    [nome, cpf, pontuacao]
+    `insert into ${tableIdentifier()} (nome, cpf, escola, pontuacao) values ($1, $2, $3, $4)`,
+    [nome, cpf, escola, pontuacao]
   );
   return { action: "cadastrado", total: pontuacao, adicionado: pontuacao };
 }
@@ -401,13 +424,14 @@ async function substituirAluno(cpf, body) {
   }
 
   const pontuacao = sanitizeScore(body.pontuacao);
+  const escola = sanitizeSchool(body.escola);
 
   await dbQuery(
-    `update ${tableIdentifier()} set nome = $1, pontuacao = $2 where cpf = $3`,
-    [nome, pontuacao, cpf]
+    `update ${tableIdentifier()} set nome = $1, escola = $2, pontuacao = $3 where cpf = $4`,
+    [nome, escola, pontuacao, cpf]
   );
 
-  return { nome, cpf, pontuacao };
+  return { nome, cpf, escola, pontuacao };
 }
 
 async function removerAluno(cpf) {
@@ -474,6 +498,20 @@ async function handlePublicRoutes(request, response, url) {
     }
 
     sendJson(response, 200, aluno);
+    return true;
+  }
+
+  if (request.method === "GET" && url.pathname === "/api/ranking") {
+    if (!rateLimit(request, response, "public:ranking", PUBLIC_RATE_LIMIT)) return true;
+    if (!assertDatabaseConfigured(response)) return true;
+
+    const escola = sanitizeSchool(url.searchParams.get("escola"));
+    const requestedLimit = Number(url.searchParams.get("limit") || 10);
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(50, Math.max(1, Math.floor(requestedLimit)))
+      : 10;
+    const ranking = await listarRankingDaEscola(escola, limit);
+    sendJson(response, 200, { escola, ranking });
     return true;
   }
 
@@ -569,6 +607,7 @@ async function handleAdminAlunoRoutes(request, response, url) {
     const nome = sanitizeName(body.nome);
     const cpf = normalizeCpf(body.cpf);
     const pontuacao = sanitizeScore(body.pontuacao);
+    const escola = sanitizeSchool(body.escola);
 
     if (!nome) {
       sendJson(response, 400, { message: "Informe o nome do aluno." });
@@ -577,7 +616,7 @@ async function handleAdminAlunoRoutes(request, response, url) {
 
     requireValidCpf(cpf);
 
-    const resultado = await salvarOuAtualizarAluno({ nome, cpf, pontuacao });
+    const resultado = await salvarOuAtualizarAluno({ nome, cpf, escola, pontuacao });
     sendJson(response, 200, { ok: true, ...resultado });
     return true;
   }

@@ -74,6 +74,21 @@ Object.values(dados).forEach((cidade) => {
   });
 });
 
+function preencherEscolasAdmin() {
+  const select = document.getElementById("escolaAluno");
+  if (!select) return;
+
+  Object.values(dados)
+    .flatMap((cidade) => Object.values(cidade.colegios).map((colegio) => colegio.nome))
+    .sort((a, b) => a.localeCompare(b, "pt-BR"))
+    .forEach((escola) => {
+      const option = document.createElement("option");
+      option.value = escola;
+      option.textContent = escola;
+      select.appendChild(option);
+    });
+}
+
 // =====================
 // UTIL
 // =====================
@@ -129,6 +144,42 @@ function mostrarErro(container, mensagem) {
     </div>`;
 }
 
+function escaparHtml(valor) {
+  return String(valor)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function limparRankingEscola() {
+  document.getElementById("rankingEscola").innerHTML = "";
+}
+
+async function carregarRankingEscola(escola) {
+  const ranking = document.getElementById("rankingEscola");
+  ranking.innerHTML = `<div class="ranking-carregando">Carregando ranking da escola...</div>`;
+
+  try {
+    const resposta = await requestJson(`/api/ranking?escola=${encodeURIComponent(escola)}&limit=10`);
+    const cidade = document.getElementById("cidade").value;
+    const colegioKey = document.getElementById("colegio").value;
+    const escolaAtual = cidade && colegioKey ? dados[cidade].colegios[colegioKey].nome : "";
+    if (escolaAtual !== escola) return;
+
+    if (resposta.ranking.length === 0) {
+      ranking.innerHTML = `<section class="ranking-box"><h2>Ranking — ${escaparHtml(escola)}</h2><p>Ainda não há alunos vinculados a esta escola.</p></section>`;
+      return;
+    }
+
+    ranking.innerHTML = `<section class="ranking-box"><h2>Ranking — ${escaparHtml(escola)}</h2><ol>${resposta.ranking.map((aluno) => `
+      <li><span class="ranking-posicao">${aluno.posicao}º</span><span class="ranking-nome">${escaparHtml(aluno.nome)}</span><strong>${aluno.pontuacao} pts</strong></li>`).join("")}</ol></section>`;
+  } catch (error) {
+    ranking.innerHTML = `<div class="status-box error">Não foi possível carregar o ranking: ${escaparHtml(error.message)}</div>`;
+  }
+}
+
 // =====================
 // COLÉGIOS
 // =====================
@@ -137,6 +188,7 @@ function atualizarColegios() {
   const selectColegio = document.getElementById("colegio");
 
   selectColegio.innerHTML = '<option value="">Selecione...</option>';
+  limparRankingEscola();
   document.getElementById("resultado").innerHTML = `
     <div class="placeholder">
       <div class="placeholder-icon">
@@ -220,6 +272,7 @@ function mostrarHorarios() {
   }
 
   resultado.innerHTML = html;
+  carregarRankingEscola(colegio.nome);
 }
 
 // =====================
@@ -321,11 +374,13 @@ async function salvarAluno(event) {
 
   const nomeInput = document.getElementById("nomeAluno");
   const cpfInput = document.getElementById("cpfCadastro");
+  const escolaInput = document.getElementById("escolaAluno");
   const pontuacaoInput = document.getElementById("pontuacaoAluno");
   const resultado = document.getElementById("resultadoCadastro");
 
   const nome = nomeInput.value.trim();
   const cpf = cpfInput.value.replace(/\D/g, "");
+  const escola = escolaInput.value;
   const pontuacao = Number(pontuacaoInput.value);
 
   if (!nome) {
@@ -335,6 +390,11 @@ async function salvarAluno(event) {
 
   if (cpf.length !== 11) {
     mostrarErro(resultado, "Informe um CPF com 11 números.");
+    return;
+  }
+
+  if (!escola) {
+    mostrarErro(resultado, "Selecione a escola do aluno.");
     return;
   }
 
@@ -349,17 +409,18 @@ async function salvarAluno(event) {
     const resposta = await requestJson("/api/admin/alunos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, cpf, pontuacao })
+      body: JSON.stringify({ nome, cpf, escola, pontuacao })
     });
 
     resultado.innerHTML = `
       <div class="status-box success">
         <strong>${nome}</strong><br>
-        Aluno ${resposta.action} com sucesso. CPF: ${mascararCpfSaida(cpf)}. Foram adicionados ${resposta.adicionado} pontos. Total atual: ${resposta.total} pontos.
+        Aluno ${resposta.action} com sucesso. Escola: ${escaparHtml(escola)}. CPF: ${mascararCpfSaida(cpf)}. Foram adicionados ${resposta.adicionado} pontos. Total atual: ${resposta.total} pontos.
       </div>`;
 
     nomeInput.value = "";
     cpfInput.value = "";
+    escolaInput.value = "";
     pontuacaoInput.value = "";
   } catch (error) {
     mostrarErro(resultado, error.message);
@@ -373,5 +434,7 @@ window.consultarPontuacao = consultarPontuacao;
 window.entrarAdmin = entrarAdmin;
 window.sairAdmin = sairAdmin;
 window.salvarAluno = salvarAluno;
+
+preencherEscolasAdmin();
 
 carregarSessaoAdmin();

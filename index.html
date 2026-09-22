@@ -54,6 +54,7 @@
           <p>Escolha sua cidade e colégio<br>para ver os horários.</p>
         </div>
       </div>
+      <div id="rankingEscola" class="ranking-escola" aria-live="polite"></div>
     </div>
   </div>
 
@@ -148,6 +149,12 @@
             oninput="formatarCPF(this)"
             required
           >
+        </div>
+        <div class="select-wrap">
+          <label for="escolaAluno">Escola</label>
+          <select id="escolaAluno" required>
+            <option value="">Selecione a escola...</option>
+          </select>
         </div>
         <div class="select-wrap">
           <label for="pontuacaoAluno">Pontuação</label>

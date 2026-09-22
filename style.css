@@ -254,6 +254,63 @@ body {
   margin-top: 3px;
 }
 
+.ranking-escola {
+  margin-top: 1.25rem;
+}
+
+.ranking-carregando {
+  color: #5a8a6a;
+  font-size: 14px;
+}
+
+.ranking-box {
+  border-top: 1px solid #e8f0eb;
+  padding-top: 1.25rem;
+}
+
+.ranking-box h2 {
+  margin: 0 0 0.85rem;
+  color: #1a4731;
+  font-size: 1.05rem;
+}
+
+.ranking-box p {
+  color: #5a8a6a;
+  font-size: 14px;
+  margin: 0;
+}
+
+.ranking-box ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ranking-box li {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 0.65rem;
+  background: #f7faf8;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  color: #1a4731;
+  font-size: 14px;
+}
+
+.ranking-posicao {
+  color: #2d7a52;
+  font-weight: 700;
+}
+
+.ranking-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .status-box {
   border-radius: 14px;
   padding: 14px 16px;
