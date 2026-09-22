@@ -21,9 +21,5 @@
       "source": "/imagens/(.*)",
       "destination": "/api/index.js"
     },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
-    }
   ]
 }
