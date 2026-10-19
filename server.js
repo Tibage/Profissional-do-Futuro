@@ -23,7 +23,6 @@ const PUBLIC_RATE_LIMIT = envNumber("PUBLIC_RATE_LIMIT", 60);
 const ADMIN_RATE_LIMIT = envNumber("ADMIN_RATE_LIMIT", 180);
 const COOKIE_SECURE = cleanEnv(process.env.SESSION_COOKIE_SECURE) === "true";
 
-const sessions = new Map();
 const rateBuckets = new Map();
 const db = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL }) : null;
 
@@ -127,12 +126,6 @@ function rateLimit(request, response, keyPrefix, maxRequests) {
 function clearExpiredState() {
   const now = Date.now();
 
-  for (const [token, session] of sessions.entries()) {
-    if (session.expiresAt < now) {
-      sessions.delete(token);
-    }
-  }
-
   for (const [key, bucket] of rateBuckets.entries()) {
     if (bucket.resetAt < now) {
       rateBuckets.delete(key);
@@ -169,32 +162,22 @@ function isValidSignedToken(token) {
   if (!raw || !signature || !SESSION_SECRET) return false;
 
   const expected = signSession(raw);
-  return safeEqual(signature, expected);
+  if (!safeEqual(signature, expected)) return false;
+
+  const [expiresAt] = raw.split("-");
+  const expiration = Number(expiresAt);
+  return Number.isFinite(expiration) && expiration > Date.now();
 }
 
 function isAuthenticated(request) {
   const token = getSessionToken(request);
-  if (!token || !isValidSignedToken(token)) return false;
-
-  const session = sessions.get(token);
-  if (!session) return false;
-
-  if (session.expiresAt < Date.now()) {
-    sessions.delete(token);
-    return false;
-  }
-
-  session.expiresAt = Date.now() + SESSION_TTL_MS;
-  return true;
+  return Boolean(token && isValidSignedToken(token));
 }
 
 function createSession() {
-  const raw = crypto.randomBytes(32).toString("hex");
+  const expiresAt = Date.now() + SESSION_TTL_MS;
+  const raw = `${expiresAt}-${crypto.randomBytes(32).toString("hex")}`;
   const token = `${raw}.${signSession(raw)}`;
-  sessions.set(token, {
-    createdAt: Date.now(),
-    expiresAt: Date.now() + SESSION_TTL_MS
-  });
   return token;
 }
 
@@ -558,11 +541,6 @@ async function handleAdminAuthRoutes(request, response, url) {
   }
 
   if (request.method === "POST" && url.pathname === "/api/admin/logout") {
-    const token = getSessionToken(request);
-    if (token) {
-      sessions.delete(token);
-    }
-
     sendJson(response, 200, { authenticated: false }, {
       "Set-Cookie": buildSessionCookie("", 0)
     });
