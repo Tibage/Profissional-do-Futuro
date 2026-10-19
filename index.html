@@ -175,6 +175,18 @@
           A área administrativa foi liberada. Cadastre ou atualize a pontuação do aluno.
         </div>
       </div>
+
+      <section class="organizar-alunos" aria-labelledby="organizarAlunosTitulo">
+        <div>
+          <h2 id="organizarAlunosTitulo">Vincular alunos já cadastrados</h2>
+          <p>Pesquise pelo nome ou CPF e selecione a escola. A pontuação atual será mantida.</p>
+        </div>
+        <form class="busca-alunos" onsubmit="buscarAlunos(event)">
+          <input id="buscaAluno" type="search" placeholder="Nome ou CPF do aluno" autocomplete="off">
+          <button class="action-button" type="submit">Buscar</button>
+        </form>
+        <div id="listaAlunos" class="lista-alunos" aria-live="polite"></div>
+      </section>
     </div>
   </div>
 </div>

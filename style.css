@@ -311,6 +311,80 @@ body {
   white-space: nowrap;
 }
 
+.organizar-alunos {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e8f0eb;
+}
+
+.organizar-alunos h2 {
+  margin: 0;
+  color: #1a4731;
+  font-size: 1.05rem;
+}
+
+.organizar-alunos p {
+  margin: 0.35rem 0 1rem;
+  color: #5a8a6a;
+  font-size: 14px;
+}
+
+.busca-alunos {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+}
+
+.busca-alunos input,
+.aluno-escola select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #cddfd3;
+  border-radius: 10px;
+  color: #1a4731;
+  background: #fff;
+}
+
+.lista-alunos {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.lista-vazia {
+  padding: 0.75rem;
+  background: #f7faf8;
+  border-radius: 10px;
+}
+
+.aluno-item {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(180px, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border: 1px solid #e0ebe3;
+  border-radius: 12px;
+}
+
+.aluno-dados {
+  display: grid;
+  gap: 0.25rem;
+  color: #1a4731;
+}
+
+.aluno-dados span,
+.aluno-escola span {
+  color: #5a8a6a;
+  font-size: 12px;
+}
+
+.aluno-escola {
+  display: grid;
+  gap: 0.3rem;
+}
+
 .status-box {
   border-radius: 14px;
   padding: 14px 16px;
@@ -466,6 +540,7 @@ body {
   .pontuacao-topo { flex-direction: column; align-items: flex-start; }
   .pontuacao-valor { width: 100%; }
   .admin-header { flex-direction: column; align-items: flex-start; }
+  .busca-alunos, .aluno-item { grid-template-columns: 1fr; }
 }
 
 @keyframes fadeUp {

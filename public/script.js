@@ -68,6 +68,8 @@ const eventosGerais = [
   }
 ];
 
+const alunosEncontrados = new Map();
+
 Object.values(dados).forEach((cidade) => {
   Object.values(cidade.colegios).forEach((colegio) => {
     colegio.atividades = eventosGerais.map((evento) => ({ ...evento }));
@@ -87,6 +89,14 @@ function preencherEscolasAdmin() {
       option.textContent = escola;
       select.appendChild(option);
     });
+}
+
+function opcoesEscolaHtml(escolaSelecionada = "") {
+  return Object.values(dados)
+    .flatMap((cidade) => Object.values(cidade.colegios).map((colegio) => colegio.nome))
+    .sort((a, b) => a.localeCompare(b, "pt-BR"))
+    .map((escola) => `<option value="${escaparHtml(escola)}"${escola === escolaSelecionada ? " selected" : ""}>${escaparHtml(escola)}</option>`)
+    .join("");
 }
 
 // =====================
@@ -332,6 +342,7 @@ async function carregarSessaoAdmin() {
   try {
     const sessao = await requestJson("/api/admin/session");
     atualizarAreaAdmin(Boolean(sessao.authenticated));
+    if (sessao.authenticated) buscarAlunos();
   } catch (error) {
     atualizarAreaAdmin(false);
   }
@@ -355,6 +366,7 @@ async function entrarAdmin(event) {
 
     senhaInput.value = "";
     atualizarAreaAdmin(true);
+    buscarAlunos();
   } catch (error) {
     alert(error.message);
     senhaInput.value = "";
@@ -366,6 +378,7 @@ async function sairAdmin() {
     await requestJson("/api/admin/logout", { method: "POST" });
   } finally {
     atualizarAreaAdmin(false);
+    document.getElementById("listaAlunos").innerHTML = "";
   }
 }
 
@@ -427,6 +440,70 @@ async function salvarAluno(event) {
   }
 }
 
+async function buscarAlunos(event) {
+  if (event) event.preventDefault();
+
+  const buscaInput = document.getElementById("buscaAluno");
+  const lista = document.getElementById("listaAlunos");
+  const busca = buscaInput.value.trim();
+  lista.innerHTML = `<div class="status-box info">Carregando alunos...</div>`;
+
+  try {
+    const resposta = await requestJson(`/api/admin/alunos?pageSize=100&search=${encodeURIComponent(busca)}`);
+    alunosEncontrados.clear();
+    resposta.alunos.forEach((aluno) => alunosEncontrados.set(aluno.cpf, aluno));
+
+    if (resposta.alunos.length === 0) {
+      lista.innerHTML = `<p class="lista-vazia">Nenhum aluno encontrado.</p>`;
+      return;
+    }
+
+    lista.innerHTML = resposta.alunos.map((aluno) => `
+      <article class="aluno-item">
+        <div class="aluno-dados">
+          <strong>${escaparHtml(aluno.nome)}</strong>
+          <span>CPF: ${mascararCpfSaida(aluno.cpf)} · ${aluno.pontuacao} pontos</span>
+        </div>
+        <label class="aluno-escola">
+          <span>Escola</span>
+          <select id="escola-${aluno.cpf}">
+            <option value="">Selecione a escola...</option>
+            ${opcoesEscolaHtml(aluno.escola || "")}
+          </select>
+        </label>
+        <button class="action-button secondary-button" type="button" onclick="vincularAluno('${aluno.cpf}')">Salvar escola</button>
+      </article>`).join("");
+  } catch (error) {
+    mostrarErro(lista, error.message);
+  }
+}
+
+async function vincularAluno(cpf) {
+  const aluno = alunosEncontrados.get(cpf);
+  const escola = document.getElementById(`escola-${cpf}`).value;
+  const lista = document.getElementById("listaAlunos");
+
+  if (!aluno || !escola) {
+    alert("Selecione a escola do aluno.");
+    return;
+  }
+
+  try {
+    await requestJson(`/api/admin/alunos/${cpf}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: aluno.nome, escola, pontuacao: aluno.pontuacao })
+    });
+    aluno.escola = escola;
+    const status = document.createElement("div");
+    status.className = "status-box success";
+    status.textContent = `${aluno.nome} foi vinculado(a) a ${escola}. A pontuação de ${aluno.pontuacao} pontos foi mantida.`;
+    lista.prepend(status);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
 window.atualizarColegios = atualizarColegios;
 window.mostrarHorarios = mostrarHorarios;
 window.formatarCPF = formatarCPF;
@@ -434,6 +511,8 @@ window.consultarPontuacao = consultarPontuacao;
 window.entrarAdmin = entrarAdmin;
 window.sairAdmin = sairAdmin;
 window.salvarAluno = salvarAluno;
+window.buscarAlunos = buscarAlunos;
+window.vincularAluno = vincularAluno;
 
 preencherEscolasAdmin();
 
